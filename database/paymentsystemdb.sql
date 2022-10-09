@@ -8,13 +8,16 @@ DROP TABLE IF EXISTS payment_fine;
 DROP TABLE IF EXISTS payment_fee;
 DROP TABLE IF EXISTS payment_product_stock;
 DROP TABLE IF EXISTS payment;
+DROP TABLE IF EXISTS product_offered_photos;
 DROP TABLE IF EXISTS product_stock;
 DROP TABLE IF EXISTS product_offered;
 DROP TABLE IF EXISTS student_fine;
 DROP TABLE IF EXISTS payment_status;
 DROP TABLE IF EXISTS payment_type;
 DROP TABLE IF EXISTS fee;
+DROP TABLE IF EXISTS organization_photo;
 DROP TABLE IF EXISTS school_organization;
+DROP TABLE IF EXISTS student_photo;
 DROP TABLE IF EXISTS student;
 DROP TABLE IF EXISTS rating;
 DROP TABLE IF EXISTS product_review;
@@ -23,9 +26,11 @@ DROP TABLE IF EXISTS likes_review;
 
 SET foreign_key_checks = 1;
 
+DROP TRIGGER IF EXISTS student_insert;
+
 CREATE TABLE IF NOT EXISTS student (
 	s_index int NOT NULL AUTO_INCREMENT UNIQUE,
-    student_id VARCHAR(10) NOT NULL,
+    student_id VARCHAR(10) DEFAULT 'NOTSET',
     lastname TINYTEXT,
     firstname TINYTEXT,
     middlename TINYTEXT,
@@ -52,12 +57,27 @@ CREATE TABLE IF NOT EXISTS phone_number (
     FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS student_photo (
+	student_id VARCHAR(10) NOT NULL,
+    profile_imagedata MEDIUMBLOB,
+    wallpaper_imagedata MEDIUMBLOB,
+    PRIMARY KEY (student_id),
+    FOREIGN KEY (student_id) REFERENCES student(student_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS school_organization (
 	org_id int NOT NULL AUTO_INCREMENT UNIQUE,
-    organization_code VARCHAR(10) NOT NULL,
+    organization_code VARCHAR(10) NOT NULL UNIQUE,
     org_description TINYTEXT NOT NULL,
-    INDEX organization_code (organization_code),
     PRIMARY KEY (org_id, organization_code)
+);
+
+CREATE TABLE IF NOT EXISTS organization_photo (
+	organization_code VARCHAR(10) NOT NULL,
+    logo_imagedata MEDIUMBLOB,
+    wallpaper_imagedata MEDIUMBLOB,
+    PRIMARY KEY (organization_code),
+    FOREIGN KEY (organization_code) REFERENCES school_organization(organization_code) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS fee (
@@ -76,6 +96,15 @@ CREATE TABLE IF NOT EXISTS product_offered (
      product_description TINYTEXT,
      PRIMARY KEY (product_id),
      FOREIGN KEY (organization_code) REFERENCES school_organization(organization_code) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS product_offered_photos (
+	photo_index int NOT NULL AUTO_INCREMENT UNIQUE,
+	product_id int NOT NULL,
+    imagedata MEDIUMBLOB,
+    isMain BOOLEAN NOT NULL DEFAULT FALSE,
+    PRIMARY KEY (photo_index, product_id),
+    FOREIGN KEY (product_id) REFERENCES product_offered(product_id)
 );
 
 CREATE TABLE IF NOT EXISTS product_stock (
@@ -182,7 +211,7 @@ CREATE TABLE IF NOT EXISTS likes_review (
 
 CREATE TABLE IF NOT EXISTS member_role (
 	role_index int NOT NULL UNIQUE,
-    role_description VARCHAR(10) CHECK (role_description IN ('NONOFFICER', 'OFFICER')),
+    role_description VARCHAR(11) CHECK (role_description IN ('NONOFFICER', 'OFFICER', 'EXECOFFICER')),
     PRIMARY KEY (role_index)
 );
 
@@ -208,7 +237,8 @@ VALUES (0, 'UNPAID'),
 
 INSERT INTO member_role (role_index, role_description)
 VALUES (0, 'NONOFFICER'),
-(1, 'OFFICER');
+(1, 'OFFICER'),
+(2, 'EXECOFFICER');
 
 INSERT INTO rating (rate, rate_description)
 VALUES (1, 'POOR'),
@@ -216,3 +246,4 @@ VALUES (1, 'POOR'),
 (3, 'GOOD'),
 (4, 'VERY GOOD'),
 (5, 'PERFECT');
+
