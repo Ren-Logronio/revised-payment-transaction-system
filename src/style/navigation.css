@@ -1,0 +1,14 @@
+li {
+    display: inline;
+    float: left;
+}
+
+li .right {
+    display: inline;
+    float: right;
+}
+
+a {
+    display: block;
+    padding: 8px;
+}

@@ -1,0 +1,11 @@
+:root {
+
+    /*color schemes*/
+    --background: #f0e8e8;
+    --foreground: #f0e8e8;
+    --shadow: #665a5a;
+}
+
+body{
+    background-color: var(--background);
+}
