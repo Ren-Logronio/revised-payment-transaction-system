@@ -17,7 +17,8 @@
             unset($_SESSION['LOGINERROR']);
             endif;
         ?>
+
         
-        Welcome to MSU Payment System
+        Welcome to MSU Payment System, <?php $name = $_SESSION['USER']; echo "$name";?>
     </body>
 </html>
